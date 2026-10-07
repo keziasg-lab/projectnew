@@ -1,0 +1,38 @@
+name: HTML Continuous Integration
+
+# Trigger the workflow on pushes or pull requests to the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Fetch the repository files
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment to run tools
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Step 3: Install HTMLhint (Linter) and Lychee (Link Checker) globally
+      - name: Install CI tools
+        run: |
+          npm install -g htmlhint
+
+      # Step 4: Run the HTML linter to catch syntax errors or missing tags
+      - name: Run HTMLHint Linter
+        run: htmlhint "**/*.html"
+
+      # Step 5: Check for broken links (both internal paths and external URLs)
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --balancetags "**/*.html"
